@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     },
   },
   poweredByHeader: false,
+  // Hide the floating Next.js "N" dev badge (error overlays still appear when something breaks).
+  devIndicators: false,
   // Ship SQL migrations with the server bundle (used when AUTO_MIGRATE=true).
   outputFileTracingIncludes: { "/*": ["./drizzle/**/*"] },
 };

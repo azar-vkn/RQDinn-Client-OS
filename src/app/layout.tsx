@@ -21,7 +21,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="min-h-dvh">
+      {/* Browser extensions (e.g. Grammarly) inject attributes on <body>; don't treat that as a hydration error. */}
+      <body className="min-h-dvh" suppressHydrationWarning>
         {children}
         <Toaster
           position="bottom-right"
