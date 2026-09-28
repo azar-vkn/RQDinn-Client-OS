@@ -2,6 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { drizzle as drizzlePostgres, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";
+import { isDemoMode } from "../demo-mode";
 
 /**
  * Database access.
@@ -49,6 +50,13 @@ function createState(): DbState {
     return { db, driver: "postgres", ready, close: () => sqlClient.end() };
   }
 
+  // The embedded database needs a writable disk, so it can't run on Vercel.
+  if (process.env.VERCEL) {
+    throw new Error(
+      "DATABASE_URL is not set. Add your Supabase connection string in Vercel → Project → Settings → Environment Variables, then redeploy.",
+    );
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { PGlite } = require("@electric-sql/pglite") as typeof import("@electric-sql/pglite");
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -61,7 +69,7 @@ function createState(): DbState {
     await client.waitReady;
     const { migrate } = await import("drizzle-orm/pglite/migrator");
     await migrate(db as never, { migrationsFolder: migrationsFolder() });
-    if (process.env.DEMO_MODE !== "false") {
+    if (isDemoMode()) {
       const { seedIfEmpty } = await import("./seed");
       await seedIfEmpty(db);
     }

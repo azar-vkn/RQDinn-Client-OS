@@ -7,6 +7,7 @@ import { getAgency } from "@/server/services/settings";
 import { listTemplates } from "@/server/services/agreements";
 import { channelStatus } from "@/server/integrations/notifications/channels";
 import { razorpayProvider } from "@/server/integrations/payments";
+import { isDemoMode } from "@/server/demo-mode";
 import { PageHeader, LinkTabs } from "@/components/shared/layout";
 import { Card, CardHeader } from "@/components/ui/card";
 import { AgencyForm, DemoReset, PasswordForm, TeamSection, TemplateEditor } from "@/components/settings/settings-forms";
@@ -92,7 +93,7 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
               ))}
             </ul>
           </Card>
-          {isAdmin && process.env.DEMO_MODE !== "false" && (
+          {isAdmin && isDemoMode() && (
             <Card>
               <CardHeader title="Demo data" description="Reset the workspace to the seeded demo state. Useful before a client demo." />
               <div className="p-5">

@@ -3,6 +3,7 @@ import { getCurrentUser, homeFor } from "@/server/auth/session";
 import { LoginForm } from "./login-form";
 import { Wordmark } from "@/components/shared/brand";
 import { DEMO_PASSWORD } from "@/server/db/demo";
+import { isDemoMode } from "@/server/demo-mode";
 
 export const metadata = { title: "Sign in" };
 
@@ -11,7 +12,7 @@ export default async function LoginPage(props: PageProps<"/login">) {
   if (user) redirect(homeFor(user.role));
   const sp = await props.searchParams;
   const next = typeof sp.next === "string" ? sp.next : "";
-  const demo = process.env.DEMO_MODE !== "false";
+  const demo = isDemoMode();
   const demoPassword = demo ? DEMO_PASSWORD : null;
 
   return (

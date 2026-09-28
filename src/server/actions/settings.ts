@@ -9,6 +9,7 @@ import { requireAdmin } from "@/server/auth/session";
 import { generateTempPassword, hashPassword } from "@/server/auth/password";
 import { DEFAULT_AGENCY, setSetting } from "@/server/services/settings";
 import { invalid } from "@/server/errors";
+import { isDemoMode } from "@/server/demo-mode";
 import { formObject, run } from "./run";
 import { optionalText, requiredText, uuid } from "./schemas";
 
@@ -62,7 +63,7 @@ export async function setUserActiveAction(userId: string, active: boolean) {
 export async function resetDemoDataAction(fresh: boolean) {
   const res = await run(async () => {
     await requireAdmin();
-    if (process.env.DEMO_MODE === "false") throw invalid("Demo reset is disabled (DEMO_MODE=false).");
+    if (!isDemoMode()) throw invalid("Demo reset is disabled because demo mode is off.");
     const { truncateAll, seed } = await import("@/server/db/seed");
     await truncateAll();
     await seed({ freshDparkz: fresh });
