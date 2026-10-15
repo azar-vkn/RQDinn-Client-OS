@@ -2,8 +2,6 @@ import "server-only";
 import { lookup } from "node:dns/promises";
 import { BlockList, isIP } from "node:net";
 
-export { websiteScreenshotUrl } from "@/lib/screenshot";
-
 /**
  * Finds a website's share image (og:image / twitter:image) so portfolio cards
  * can show a cover without anyone uploading one.
