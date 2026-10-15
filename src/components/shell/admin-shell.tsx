@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Dialog } from "radix-ui";
 import {
   BarChart3,
+  BriefcaseBusiness,
   Building2,
   CheckSquare,
   ChevronsLeft,
@@ -19,6 +20,7 @@ import {
   LogOut,
   Menu,
   MoreHorizontal,
+  Package,
   Plus,
   Search,
   Settings,
@@ -45,6 +47,8 @@ const NAV = [
   { label: "Onboarding", href: "/onboarding", icon: ClipboardList },
   { label: "Workflows", href: "/workflows", icon: GitBranch },
   { label: "Maintenance", href: "/maintenance", icon: Wrench },
+  { label: "Services", href: "/services", icon: Package },
+  { label: "Portfolio", href: "/portfolio", icon: BriefcaseBusiness },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Settings", href: "/settings", icon: Settings },
 ];

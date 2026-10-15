@@ -67,6 +67,7 @@ export const maintenanceType = pgEnum("maintenance_type", [
   "bug",
   "other",
 ]);
+export const serviceBilling = pgEnum("service_billing", ["one_time", "monthly", "yearly"]);
 
 /* ───────────────────────────── Identity ───────────────────────────── */
 
@@ -626,6 +627,44 @@ export const settings = pgTable("settings", {
   updatedAt: updatedAt(),
 });
 
+/* ───────────────────────────── Sales ───────────────────────────── */
+
+/** Service catalog used by the Services page price calculator. */
+export const services = pgTable("services", {
+  id: id(),
+  name: text().notNull(),
+  category: text().notNull().default("General"),
+  description: text(),
+  /** Paise. */
+  price: integer().notNull(),
+  billing: serviceBilling().notNull().default("one_time"),
+  features: jsonb().$type<string[]>().notNull().default(sql`'[]'::jsonb`),
+  position: integer().notNull().default(0),
+  /** Hidden services stay in the catalog but can't be added to a quote. */
+  isActive: boolean().notNull().default(true),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+/** Showcase of delivered work, each linking to the live site. */
+export const portfolioItems = pgTable("portfolio_items", {
+  id: id(),
+  title: text().notNull(),
+  url: text().notNull(),
+  clientName: text(),
+  category: text(),
+  description: text(),
+  /** Optional cover image link; without it the page shows a live screenshot of the site. */
+  imageUrl: text(),
+  tags: jsonb().$type<string[]>().notNull().default(sql`'[]'::jsonb`),
+  year: integer(),
+  isFeatured: boolean().notNull().default(false),
+  projectId: uuid().references(() => projects.id, { onDelete: "set null" }),
+  createdById: uuid().references(() => users.id, { onDelete: "set null" }),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
 /* ───────────────────────────── Relations ───────────────────────────── */
 
 export const usersRelations = relations(users, ({ one }) => ({
@@ -723,6 +762,8 @@ export type Notification = typeof notifications.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type OnboardingForm = typeof onboardingForms.$inferSelect;
 export type OnboardingAnswer = typeof onboardingAnswers.$inferSelect;
+export type Service = typeof services.$inferSelect;
+export type PortfolioItem = typeof portfolioItems.$inferSelect;
 export type UserRole = (typeof userRole.enumValues)[number];
 export type StepStatus = (typeof stepStatus.enumValues)[number];
 export type PipelineStage = (typeof pipelineStage.enumValues)[number];

@@ -167,3 +167,19 @@ export const DEFAULT_DEPLOYMENT_CHECKLIST: { key: string; label: string; require
 
 export const APPROVAL_CONFIRMATION =
   "I confirm that the current website version has been reviewed and approved for launch.";
+
+export const SERVICE_BILLINGS = ["one_time", "monthly", "yearly"] as const;
+export type ServiceBillingValue = (typeof SERVICE_BILLINGS)[number];
+export const SERVICE_BILLING_LABEL: Record<ServiceBillingValue, string> = {
+  one_time: "One-time",
+  monthly: "Monthly",
+  yearly: "Yearly",
+};
+/** Shown after a price, e.g. "₹5,000 / month". */
+export const SERVICE_BILLING_SUFFIX: Record<ServiceBillingValue, string> = {
+  one_time: "",
+  monthly: "/ month",
+  yearly: "/ year",
+};
+/** GST rate offered on the Services quote calculator. */
+export const QUOTE_GST_PERCENT = 18;

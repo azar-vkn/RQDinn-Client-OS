@@ -15,6 +15,20 @@
       "when": 1790405531456,
       "tag": "0001_enable_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792042546356,
+      "tag": "0002_services_portfolio",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792043930441,
+      "tag": "0003_single_price_services",
+      "breakpoints": true
     }
   ]
 }

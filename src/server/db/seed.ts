@@ -28,7 +28,7 @@ const ALL_TABLES = [
   "notifications", "activity_logs", "sessions", "maintenance_requests", "launches", "deployment_items", "approvals",
   "revisions", "previews", "tasks", "payments", "payment_milestones", "invoice_items", "invoices", "agreements",
   "agreement_templates", "documents", "files", "onboarding_answers", "onboarding_forms", "project_steps", "projects",
-  "workflow_steps", "workflows", "client_contacts", "users", "clients", "settings",
+  "workflow_steps", "workflows", "client_contacts", "users", "clients", "settings", "services", "portfolio_items",
 ];
 
 export async function truncateAll(database: Database = db) {
