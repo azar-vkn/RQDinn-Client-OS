@@ -69,6 +69,12 @@ export function PortfolioEditor({
   };
 
   const previewUrl = normalizeUrl(url) || "";
+  // Wait until the link stops changing before asking for a hero screenshot.
+  const [shotUrl, setShotUrl] = React.useState(previewUrl);
+  React.useEffect(() => {
+    const t = setTimeout(() => setShotUrl(previewUrl), 600);
+    return () => clearTimeout(t);
+  }, [previewUrl]);
   const previewImage = imageUrl.trim() ? normalizeUrl(imageUrl) || null : null;
 
   return (
@@ -121,7 +127,7 @@ export function PortfolioEditor({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-[1fr_200px] sm:items-start">
-            <Field label="Cover image link (optional)" htmlFor="pf-image" error={errors.imageUrl} hint="Paste an image link, or use Detect to take the site's preview image (or a screenshot of the site).">
+            <Field label="Cover image link (optional)" htmlFor="pf-image" error={errors.imageUrl} hint="Leave empty to use a screenshot of the site's hero automatically. Or paste an image link, or use Detect to take the site's share image.">
               <div className="flex gap-2">
                 <Input id="pf-image" inputMode="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…/cover.jpg" aria-invalid={!!errors.imageUrl || undefined} />
                 <Button type="button" variant="secondary" loading={detect.pending} loadingText="Detecting…" disabled={!previewUrl} onClick={() => detect.execute(url)}>
@@ -130,7 +136,7 @@ export function PortfolioEditor({
               </div>
             </Field>
             <div className="aspect-[16/10] overflow-hidden rounded-xl border border-line bg-cream" aria-label="Cover preview">
-              <PortfolioCover title={title.trim() || "Project"} url={previewUrl || "https://example.com"} imageUrl={previewImage} />
+              <PortfolioCover title={title.trim() || "Project"} url={shotUrl || previewUrl || "https://example.com"} imageUrl={previewImage} screenshot={!!shotUrl && shotUrl === previewUrl} />
             </div>
           </div>
 

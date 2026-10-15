@@ -2,6 +2,8 @@ import "server-only";
 import { lookup } from "node:dns/promises";
 import { BlockList, isIP } from "node:net";
 
+export { websiteScreenshotUrl } from "@/lib/screenshot";
+
 /**
  * Finds a website's share image (og:image / twitter:image) so portfolio cards
  * can show a cover without anyone uploading one.
@@ -147,11 +149,3 @@ export async function findShareImage(url: string): Promise<string | null> {
   }
 }
 
-/**
- * A live screenshot of the page, for sites that publish no share image.
- * WordPress mShots is free and keyless; it serves a "generating" placeholder
- * for the first few seconds, then the cached screenshot.
- */
-export function websiteScreenshotUrl(url: string): string {
-  return `https://s.wordpress.com/mshots/v1/${encodeURIComponent(url)}?w=1280&h=800`;
-}
