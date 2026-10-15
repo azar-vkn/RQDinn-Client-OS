@@ -5,13 +5,12 @@ import { toast } from "sonner";
 import { Check, Copy, Package, Pencil, Plus, RotateCcw, Search, ShoppingCart, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate, formatMoney } from "@/lib/format";
-import { rupeesToPaise } from "@/lib/validators";
 import { QUOTE_GST_PERCENT, SERVICE_BILLING_SUFFIX, type ServiceBillingValue } from "@/lib/constants";
 import type { CatalogService } from "@/server/services/catalog";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Field, Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/shared/layout";
 import { ServiceEditor } from "./service-editor";
@@ -23,7 +22,6 @@ export function ServiceCatalog({ services, isAdmin, agencyName }: { services: Ca
   const [selected, setSelected] = React.useState<string[]>([]);
   const [query, setQuery] = React.useState("");
   const [category, setCategory] = React.useState("all");
-  const [discountInput, setDiscountInput] = React.useState("");
   const [gst, setGst] = React.useState(false);
   const [quoteFor, setQuoteFor] = React.useState("");
   const [editing, setEditing] = React.useState<CatalogService | "new" | null>(null);
@@ -57,13 +55,8 @@ export function ServiceCatalog({ services, isAdmin, agencyName }: { services: Ca
   const hasOneTime = hasBilling("one_time");
   const hasRecurring = hasBilling("monthly") || hasBilling("yearly");
 
-  const discountRaw = rupeesToPaise(discountInput);
-  const discountInvalid = discountInput.trim() !== "" && !Number.isFinite(discountRaw);
-  const discount = Number.isFinite(discountRaw) ? Math.min(discountRaw, oneTime) : 0;
-  const discountCapped = Number.isFinite(discountRaw) && discountRaw > oneTime && oneTime > 0;
-  const taxable = oneTime - discount;
-  const gstAmount = gst ? Math.round((taxable * QUOTE_GST_PERCENT) / 100) : 0;
-  const oneTimeTotal = taxable + gstAmount;
+  const gstAmount = gst ? Math.round((oneTime * QUOTE_GST_PERCENT) / 100) : 0;
+  const oneTimeTotal = oneTime + gstAmount;
   const monthlyTotal = withGst(monthly, gst);
   const yearlyTotal = withGst(yearly, gst);
   const firstYear = oneTimeTotal + monthlyTotal * 12 + yearlyTotal;
@@ -78,7 +71,6 @@ export function ServiceCatalog({ services, isAdmin, agencyName }: { services: Ca
 
   const clear = () => {
     setSelected([]);
-    setDiscountInput("");
     setGst(false);
   };
 
@@ -92,7 +84,6 @@ export function ServiceCatalog({ services, isAdmin, agencyName }: { services: Ca
     ];
     if (hasOneTime) {
       rows.push(`One-time subtotal: ${formatMoney(oneTime)}`);
-      if (discount > 0) rows.push(`Discount: −${formatMoney(discount)}`);
       if (gst) rows.push(`GST (${QUOTE_GST_PERCENT}%): ${formatMoney(gstAmount)}`);
       rows.push(`Total (one-time): ${formatMoney(oneTimeTotal)}`);
     }
@@ -275,20 +266,7 @@ export function ServiceCatalog({ services, isAdmin, agencyName }: { services: Ca
               </ul>
 
               <div className="space-y-3 border-t border-line-soft pt-4">
-                {hasOneTime && (
-                  <>
-                    <Row label="One-time subtotal" value={formatMoney(oneTime)} />
-                    <Field
-                      label="Discount on one-time (₹)"
-                      htmlFor="quote-discount"
-                      error={discountInvalid ? "Enter a valid amount." : null}
-                      hint={discountCapped ? "Capped at the one-time subtotal." : undefined}
-                    >
-                      <Input id="quote-discount" inputMode="decimal" value={discountInput} onChange={(e) => setDiscountInput(e.target.value)} placeholder="0" aria-invalid={discountInvalid || undefined} />
-                    </Field>
-                    {discount > 0 && <Row label="Discount" value={`−${formatMoney(discount)}`} />}
-                  </>
-                )}
+                {hasOneTime && <Row label="One-time subtotal" value={formatMoney(oneTime)} />}
                 <label className="flex items-center gap-2 text-sm text-ink-soft">
                   <input type="checkbox" checked={gst} onChange={(e) => setGst(e.target.checked)} className="size-4" />
                   Add GST ({QUOTE_GST_PERCENT}%)
