@@ -1,9 +1,26 @@
+const MSHOTS = "https://s.wordpress.com/mshots/v1/";
+
+/** WordPress mShots: a free, keyless screenshot of the page's first 1280×800 (its hero). */
+export function mshotsUrl(url: string): string {
+  return `${MSHOTS}${encodeURIComponent(url)}?w=1280&h=800`;
+}
+
 /**
- * A live screenshot of a website's hero (the first 1280×800 of the page),
- * used as the portfolio cover when no cover image is set.
- * WordPress mShots is free and keyless; it serves a "generating" placeholder
- * for the first few seconds, then the cached screenshot.
+ * The hero screenshot of a website, served through /api/screenshot. mShots
+ * answers with a "Generating Preview" placeholder until the capture is ready;
+ * the route waits for the real image so the browser never caches the placeholder.
  */
 export function websiteScreenshotUrl(url: string): string {
-  return `https://s.wordpress.com/mshots/v1/${encodeURIComponent(url)}?w=1280&h=800`;
+  return `/api/screenshot?url=${encodeURIComponent(url)}`;
+}
+
+/** Older covers stored the raw mShots link; route those through the proxy too. */
+export function coverSrc(imageUrl: string): string {
+  if (!imageUrl.startsWith(MSHOTS)) return imageUrl;
+  try {
+    const target = decodeURIComponent(new URL(imageUrl).pathname.slice("/mshots/v1/".length));
+    return websiteScreenshotUrl(target);
+  } catch {
+    return imageUrl;
+  }
 }
