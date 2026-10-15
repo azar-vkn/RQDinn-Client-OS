@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { requireAdmin } from "@/server/auth/session";
 import { deletePortfolioItem, savePortfolioItem } from "@/server/services/portfolio";
-import { findShareImage } from "@/server/integrations/link-preview";
+import { findShareImage, websiteScreenshotUrl } from "@/server/integrations/link-preview";
 import { invalid } from "@/server/errors";
 import { normalizeUrl } from "@/lib/validators";
 import { run } from "./run";
@@ -57,16 +57,19 @@ export async function savePortfolioAction(id: string | null, input: unknown) {
   }, "Portfolio saved.");
 }
 
-/** Look up the site's share image (og:image) to use as the card cover. */
+/** Use the site's share image (og:image) as the card cover, or a screenshot of the site when it has none. */
 export async function detectCoverImageAction(url: string) {
-  return run(async () => {
+  let screenshot = false;
+  const res = await run(async () => {
     await requireAdmin();
     const normalized = typeof url === "string" ? normalizeUrl(url) : null;
     if (!normalized) throw invalid("Enter the website link first.");
-    const imageUrl = await findShareImage(normalized);
-    if (!imageUrl) throw invalid("This site doesn't publish a preview image. Paste an image link instead, or leave it empty.");
-    return { imageUrl };
-  }, "Cover image found.");
+    const shareImage = await findShareImage(normalized);
+    screenshot = !shareImage;
+    return { imageUrl: shareImage ?? websiteScreenshotUrl(normalized) };
+  });
+  if (res.ok) res.message = screenshot ? "This site has no preview image, so a screenshot of it is used instead." : "Cover image found.";
+  return res;
 }
 
 export async function deletePortfolioAction(id: string) {

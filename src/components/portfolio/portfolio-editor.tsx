@@ -121,7 +121,7 @@ export function PortfolioEditor({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-[1fr_200px] sm:items-start">
-            <Field label="Cover image link (optional)" htmlFor="pf-image" error={errors.imageUrl} hint="Paste an image link, or use Detect to take the site's own preview image.">
+            <Field label="Cover image link (optional)" htmlFor="pf-image" error={errors.imageUrl} hint="Paste an image link, or use Detect to take the site's preview image (or a screenshot of the site).">
               <div className="flex gap-2">
                 <Input id="pf-image" inputMode="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…/cover.jpg" aria-invalid={!!errors.imageUrl || undefined} />
                 <Button type="button" variant="secondary" loading={detect.pending} loadingText="Detecting…" disabled={!previewUrl} onClick={() => detect.execute(url)}>
